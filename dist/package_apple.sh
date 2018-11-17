@@ -18,6 +18,7 @@ SRC_DIR=../${PLATFORM}_${ARCH}_release/src/main
 DIST_DIR=$2
 DIST_BIN=${DIST_DIR}/bin
 DIST_LIB=${DIST_DIR}/lib
+DIST_PYDLL=${DIST_LIB}/devsim
 DIST_VER=${DIST_DIR}
 
 
@@ -25,24 +26,48 @@ DIST_VER=${DIST_DIR}
 # Assume libstdc++ is a standard part of the system
 #http://developer.apple.com/library/mac/#documentation/DeveloperTools/Conceptual/CppRuntimeEnv/Articles/CPPROverview.html
 mkdir -p ${DIST_BIN}
-cp ${SRC_DIR}/devsim_py ${DIST_BIN}/devsim
-cp ${SRC_DIR}/devsim_tcl ${DIST_BIN}/devsim_tcl
+mkdir -p ${DIST_DIR}
+mkdir -p ${DIST_PYDLL}
 
+cp -v ${SRC_DIR}/devsim_py27.so ${DIST_PYDLL}
+cp -v ${SRC_DIR}/devsim_tcl ${DIST_BIN}
+cp -v __init__.py ${DIST_PYDLL}
+
+# because the non gcc build uses the system python interpreter and python 3 is not available
 if [ "$1" = "gcc" ]
   then
-cp ${SRC_DIR}/devsim_py3 ${DIST_BIN}/devsim_py3
+cp -v ${SRC_DIR}/devsim_py36.so ${DIST_PYDLL}
+cp -v ${SRC_DIR}/devsim_py37.so ${DIST_PYDLL}
 fi
 
+# INSTALL NAME CHANGE
 if [ "$1" = "gcc" ]
 then
-mkdir -p ${DIST_LIB}
-for i in ${DIST_BIN}/devsim ${DIST_BIN}/devsim_tcl
+mkdir -p ${DIST_LIB}/gcc
+
+
+###
+### python libs
+###
+for i in ${DIST_PYDLL}/devsim_py*.so
 do
 # get otool dependencies from the gcc compiler
 for j in `otool -L $i | egrep '\bgcc\b' | sed -e 's/(.*//'`
 do
-cp -vf $j ${DIST_LIB}
-install_name_tool -change $j "@executable_path/../lib/`basename $j`" $i
+cp -vf $j ${DIST_LIB}/gcc
+echo install_name_tool -change $j "@loader_path/../gcc/`basename $j`" $i
+install_name_tool -change $j "@loader_path/../gcc/`basename $j`" $i
+done
+done
+
+for i in ${DIST_BIN}/devsim_tcl
+do
+# get otool dependencies from the gcc compiler
+for j in `otool -L $i | egrep '\bgcc\b' | sed -e 's/(.*//'`
+do
+cp -vf $j ${DIST_LIB}/gcc
+echo install_name_tool -change $j "@executable_path/../lib/gcc/`basename $j`" $i
+install_name_tool -change $j "@executable_path/../lib/gcc/`basename $j`" $i
 done
 done
 fi
@@ -62,11 +87,12 @@ done
 
 
 #### Python files and the examples
-for i in python_packages examples testing
+for i in examples testing
 do
 (cd ../$i; git clean -f -d -x )
-rsync -aP --delete ../$i ${DIST_DIR}
+rsync -aqP --delete ../$i ${DIST_DIR}
 done
+rsync -aqP --delete ../python_packages ${DIST_PYDLL}
 
 
 
@@ -79,5 +105,5 @@ Source available from:
 http://www.github.com/devsim/devsim 
 commit ${COMMIT}
 EOF
-tar czf ${DIST_VER}.tgz ${DIST_DIR}
+tar czvf ${DIST_VER}.tgz ${DIST_DIR}
 

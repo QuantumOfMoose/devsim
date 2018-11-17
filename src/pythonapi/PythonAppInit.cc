@@ -25,6 +25,7 @@ extern "C" {
 }
 
 
+#if 0
 bool Python_AppInit() {
 
 #if PY_MAJOR_VERSION >=3
@@ -60,4 +61,5 @@ bool Python_AppInit() {
     );
   return true;
 }
+#endif
 

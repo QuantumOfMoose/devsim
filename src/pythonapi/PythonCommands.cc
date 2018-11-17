@@ -36,15 +36,31 @@ limitations under the License.
 #include "dsException.hh"
 #include "FPECheck.hh"
 #include "OutputStream.hh"
+#include "import.hh"
 
 #include <new>
 #include <sstream>
-#include <iostream>
+
+// Stringify
+// borrowed from dsAssert.hh
+#define STRINGIFY(x) #x
+#define TOSTRING(x) STRINGIFY(x)
+#define PASTETOKENS(x, y) x ## y
+// Module initialization function
+#if PY_MAJOR_VERSION >= 3
+#define HELPER1(x) PASTETOKENS(PyInit_, x)
+#else
+#define HELPER1(x) PASTETOKENS(init, x)
+#endif
+#define DEVSIM_MODULE_INIT HELPER1(DEVSIM_MODULE_NAME)
+#define DEVSIM_MODULE_STRING TOSTRING(DEVSIM_MODULE_NAME)
+
+// Defined in devsim_py.cc
+void devsim_initialization();
 
 using namespace dsValidate;
 
 namespace dsPy {
-
 namespace {
 struct module_state {
   module_state() : error(nullptr) {};
@@ -382,6 +398,7 @@ MYCOMMAND(get_circuit_equation_number, dsCommand::circuitGetCircuitEquationNumbe
 
 
 
+
 #if PY_MAJOR_VERSION >= 3
 static int devsim_traverse(PyObject *m, visitproc visit, void *arg) {
     Py_VISIT(GETSTATE(m)->error);
@@ -396,7 +413,7 @@ static int devsim_clear(PyObject *m) {
 
 static struct PyModuleDef moduledef = {
         PyModuleDef_HEAD_INIT,
-        "ds",
+        DEVSIM_MODULE_STRING,
         NULL,
         sizeof(struct module_state),
         devsim_methods,
@@ -408,39 +425,46 @@ static struct PyModuleDef moduledef = {
 
 #define INITERROR return NULL
 
-PyMODINIT_FUNC
-PyInit_ds(void)
+//PyMODINIT_FUNC // this next line is used instead to use DLL_PUBLIC macro
+extern "C" DLL_PUBLIC PyObject *
+DEVSIM_MODULE_INIT(void)
 #else
 #define INITERROR return
-void initds()
+extern "C" void DLL_PUBLIC DEVSIM_MODULE_INIT()
 #endif
 {
 #if PY_MAJOR_VERSION >= 3
   PyObject *module = PyModule_Create(&moduledef);
 #else
-  PyObject *module = Py_InitModule("ds", devsim_methods);
+  PyObject *module = Py_InitModule(DEVSIM_MODULE_STRING, devsim_methods);
 #endif
 
     if (module == NULL)
     {
       INITERROR;
     }
-    struct module_state *st = GETSTATE(module);
 
-    char *dserror = strdup("ds.error");
-    st->error = PyErr_NewException(dserror, NULL, NULL);
-    free(dserror);
+    // TODO: modify symdiff to use this approach
+    struct module_state *st = GETSTATE(module);
+    st->error = PyErr_NewException(const_cast<char *>(DEVSIM_MODULE_STRING ".error"), NULL, NULL);
     if (st->error == NULL) {
         Py_DECREF(module);
         INITERROR;
     }
+
     PyModule_AddObject(module, "error", st->error);
+
+    //https://www.python.org/dev/peps/pep-0396/
+    PyDict_SetItemString(PyModule_GetDict(module), "__version__", PyUnicode_FromString(DEVSIM_VERSION_STRING));
+
+    devsim_initialization();
 
 #if PY_MAJOR_VERSION >=3
   return module;
 #endif
 }
 
+#if 0
 // https://docs.python.org/3/howto/cporting.html
 // https://docs.python.org/3/extending/embedding.html
 using namespace std;
@@ -462,5 +486,6 @@ Commands_Init() {
 
   return true;
 }
+#endif
 }
 

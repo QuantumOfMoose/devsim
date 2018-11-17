@@ -1,8 +1,6 @@
 [![Build Status](https://travis-ci.org/devsim/devsim.svg?branch=master)](https://travis-ci.org/devsim/devsim)
 [![Build status](https://ci.appveyor.com/api/projects/status/github/devsim/devsim?branch=master&svg=true)](https://ci.appveyor.com/project/devsim/devsim)
 
-[![DOI](https://zenodo.org/badge/8838727.svg)](https://zenodo.org/badge/latestdoi/8838727)
-
 ### Introduction:
 **DEVSIM** - TCAD Device Simulator
 
@@ -32,7 +30,7 @@ Please see INSTALL file for installation instructions from source.  Please see
 NOTICE and LICENSE files for copyright and license information.
 
 ### Documentation:
-Documentation available in doc/devsim.pdf.  Windows specific information is available in windows.txt.
+Documentation available in doc/devsim.pdf and [online](https://www.devsim.org/manual/).  Windows specific information is available in windows.txt.
 
 ### Website:
 The official website is here:
@@ -41,7 +39,7 @@ https://www.devsim.org
 ### Support:
 
 For support and general discussion, please join our forum:
-https://groups.google.com/forum/#!forum/devsim
+https://groups.google.com/d/forum/devsim
 
 ### Contributing:
 

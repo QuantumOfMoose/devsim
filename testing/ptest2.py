@@ -15,8 +15,8 @@
 ####
 #### package test for drift diffusion
 ####
-from ds import *
-from python_packages.simple_physics import *
+from devsim import *
+from devsim.python_packages.simple_physics import *
 
 device="MyDevice"
 region="MyRegion"

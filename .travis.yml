@@ -11,6 +11,7 @@ matrix:
     env: COMPILER=clang
   - os: osx
     env: COMPILER=gcc
+    osx_image: xcode10.1
 
 #branches:
 #  only:

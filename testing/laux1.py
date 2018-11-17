@@ -38,11 +38,11 @@ try:
   import numpy
   import numpy.linalg
 except:
-  print "numpy is not available with your installation and is not being run"
+  print ("numpy is not available with your installation and is not being run")
   sys.exit(-1)
 
 
-from ds import *
+from devsim import *
 
 def calculateValues(scalar_efield, eecouple, sx, sy):
   row0 = numpy.array([0, 0, 1])

@@ -12,8 +12,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ds import *
-from python_packages.model_create import *
+from devsim import *
+from devsim.python_packages.model_create import *
 
 def Set_Mobility_Parameters(device, region):
   #As

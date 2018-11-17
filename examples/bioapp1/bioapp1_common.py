@@ -12,7 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from ds import *
+from devsim import *
 #### molarity 0.001 mole / Liter * 1 L / (1e3 cm^3) * 6.02e23 / mole = 6.02e17 /cm^3
 set_parameter(device="disk", region="solution", name="n_bound", value=6.02e17)
 #### 2q/nm^3 -->  2/nm^3 * (1 nm^3/(1e-7 cm)^3) 
@@ -50,10 +50,10 @@ for region in ("dna", "dielectric", "solution"):
 
     x=sum(get_node_model_values(device="disk", region=region, name="CylindricalNodeVolume"))
     y=sum(get_node_model_values(device="disk", region=region, name="NodeVolume"))
-    print "Volume {0} {1} {2}".format(region, x, y)
+    print("Volume {0} {1} {2}".format(region, x, y))
   else:
     y=sum(get_node_model_values(device="disk", region=region, name="NodeVolume"))
-    print "Volume {0} {1}".format(region, y)
+    print("Volume {0} {1}".format(region, y))
 
   # Electric Field Edge Model
   edge_model(device="disk", region=region, name="EField",

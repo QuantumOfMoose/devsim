@@ -1,5 +1,5 @@
 DEVSIM_CONFIG="centos_6"
-CMAKE="/usr/bin/cmake3"
+CMAKE="cmake"
 CMAKE_CXX_FLAGS=""
 CXX="/opt/rh/devtoolset-6/root/usr/bin/g++"
 CC="/opt/rh/devtoolset-6/root/usr/bin/gcc"
@@ -15,6 +15,7 @@ ARCH=`uname -m`
       -DDEVSIM_CONFIG=${DEVSIM_CONFIG} \
       -DCMAKE_CXX_FLAGS:STRING="${CMAKE_CXX_FLAGS}" \
       -DDEVSIM_EXTENDED_PRECISION=ON \
+      -DMKL_PARDISO=ON \
       -DPYTHON3=ON \
       ..)
 #  done

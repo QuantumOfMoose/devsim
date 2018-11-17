@@ -46,7 +46,6 @@ bool Interpreter::RunCommand(const std::string &command, const std::vector<std::
 
 namespace
 {
-//// this shouldn't fail
 PyObject *GetGlobalDictionary()
 {
   PyObject *main    = PyImport_ImportModule("__main__");
@@ -56,7 +55,18 @@ PyObject *GetGlobalDictionary()
 
 PyObject *GetDevsimDictionary()
 {
-  PyObject *devsim = PyImport_ImportModule("ds");
+  std::string module_name = TOSTRING(DEVSIM_MODULE_NAME);
+  std::string long_module_name = "devsim." + module_name;
+
+  PyObject *devsim = nullptr;
+  devsim = PyImport_ImportModule(long_module_name.c_str());
+  if (!devsim)
+  {
+    devsim = PyImport_ImportModule(module_name.c_str());
+  }
+
+  //PyErr_Print();
+  dsAssert(devsim, std::string("Issue loading module ") + module_name);
   PyObject *globals = PyModule_GetDict(devsim);
   return globals;
 }
@@ -114,7 +124,7 @@ ObjectHolder CreateTuple(std::vector<ObjectHolder> &objects, size_t beg, size_t 
   {
     PyObject *p = reinterpret_cast<PyObject *>(objects[beg + i].GetObject());
     Py_INCREF(p);
-    PyTuple_SET_ITEM(args, i, p);
+    PyTuple_SetItem(args, i, p);
   } 
   return ret;
 }
@@ -195,6 +205,7 @@ bool Interpreter::RunInternalCommand(const std::string &commandname, const std::
   return RunCommand(newname, arguments);
 }
 
+//TODO: pass command directly as function reference from python
 bool Interpreter::RunCommand(const std::string &commandname, const std::vector<std::pair<std::string, ObjectHolder> > &arguments)
 {
   bool ret = false;
@@ -229,6 +240,7 @@ bool Interpreter::RunCommand(const std::string &commandname, const std::vector<s
 }
 
 
+#if 0
 bool Interpreter::RunCommand(const std::string &commandString)
 {
   error_string_.clear();
@@ -244,6 +256,7 @@ bool Interpreter::RunCommand(const std::string &commandString)
 
   return (res != NULL);
 }
+#endif
 
 std::string Interpreter::GetVariable(const std::string &name)
 {
