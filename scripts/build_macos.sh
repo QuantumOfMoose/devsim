@@ -60,20 +60,21 @@ ${HOME}/anaconda/bin/conda create -y --name python37_devsim_build python=3.7
 fi
 
 
-#For Mac OS X, the Xcode command line developer tools should be installed, these contain all the necessary libraries.  The math libraries are from the Apple Accelerate Framework.  Note that a FORTRAN compiler is not required.
+#For macOS, the Xcode command line developer tools should be installed, these contain all the necessary libraries.  The math libraries are from the Apple Accelerate Framework.  Note that a FORTRAN compiler is not required.
 #https://developer.apple.com/technologies/tools
 #https://developer.apple.com/performance/accelerateframework.html
-#In addition, cmake is needed for Mac OS X.  The package may be downloaded from:
+#In addition, cmake is needed for macOS.  The package may be downloaded from:
 #http://www.cmake.org
 
 # put the tag name in first argument used for distribution
 # this script assumes git clone and submodule initialization has been done
 
 # SuperLU
-if [ ! -f external/superlu_4.3.tar.gz ]
-then
-(cd external && curl -O http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_4.3.tar.gz && tar xzf superlu_4.3.tar.gz)
-fi
+#if [ ! -f external/superlu_4.3.tar.gz ]
+#then
+#(cd external && curl -O http://crd-legacy.lbl.gov/~xiaoye/SuperLU/superlu_4.3.tar.gz && tar xzf superlu_4.3.tar.gz)
+#fi
+(cd external && tar xzf superlu_4.3.tar.gz)
 
 # SYMDIFF build
 if [ "${1}" = "gcc" ]
@@ -92,7 +93,7 @@ fi
 ####(cd external && mkdir -p CGNS-3.1.4/build && cd CGNS-3.1.4/build && cmake -DCMAKE_C_COMPILER=${CC} -DBUILD_CGNSTOOLS=OFF -DCMAKE_INSTALL_PREFIX=$PWD/../../cgnslib .. && make -j4 && make install)
 
 # SUPERLU build
-(cd external/SuperLU_4.3 && sh ../superlu_osx_10.10.sh)
+(cd external/SuperLU_4.3 && sh ../superlu_macos.sh)
 
 if [ "${1}" = "gcc" ]
 then
@@ -110,7 +111,7 @@ fi
 (cd osx_x86_64_release && make -j4)
 if [ ! -z "${2}" ]
 then
-(cd dist && bash package_apple.sh ${1} devsim_osx_${2});
+(cd dist && bash package_macos.sh ${1} devsim_macos_${2});
 fi
 
 
