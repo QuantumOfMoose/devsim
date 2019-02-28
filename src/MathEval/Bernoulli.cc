@@ -29,7 +29,7 @@ const double lnmax = log(std::numeric_limits<double>().max());
 inline double Bernoulli_Taylor(const double x)
 {
     double d = 1.0;
-    double xv = x;;
+    double xv = x;
 
     d += 1./2. * xv;
     xv *= x;
@@ -97,7 +97,16 @@ double Bernoulli(const double x)
     else if (x < 0.0)
     {
         // B(-x) = B(x) + x
-        ret = -x;
+	// B(-x) ~= x for x <= 12.5
+	if (x <= 12.5)
+	{
+		ret = x;
+	}
+	else
+	{
+        	ret = Bernoulli_Regular(x) + x;
+	}
+	// Formerly returned -x, which I think was a sign error.
     }
     else
     {
@@ -180,6 +189,7 @@ inline double derBernoulli3(double x)
     //return (ex*(1.0-x) - 1.0) * pow((ex - 1.0), -2.0);
     const double ex = exp(x);
     const double ex1 = ex - 1;
+	// I can't see how ex will ever equal ex1, but I'll leave the following if else here just in case.
     if (ex != ex1)
     { 
       //return (1.0 - x * ex / ex1) / ex1;
@@ -195,7 +205,17 @@ double derBernoulli(const double x)
 {
     const double fx = abs(x);
     double ret;
-    if (fx < 1.0e-4)
+    if (x == 0.0)
+    {
+	// This will eliminate divide by 0 problems.
+	ret = -0.5;
+    }
+    else if (x <= -17.2998)
+    {
+	// Limit as x -> -infinity.
+	ret = -1.0;
+    }
+    else if (fx < 1.0e-4)
     {
         ret = derBernoulliExp(x);
     }
@@ -245,7 +265,12 @@ double derBernoulli(double x)
 {
     const double fx = abs(x);
     double ret;
-    if ( fx < 1.0e-4 )
+    if (x == 0.0)
+    {
+	// Should eliminate divide by zero problems.
+	ret = -0.5;
+    {
+    else if ( fx < 1.0e-4 )
     {
         ret = -(0.5+x/3.0+x*x/8.0)/(1.0+x+7.0*x*x/12.0);
     }
